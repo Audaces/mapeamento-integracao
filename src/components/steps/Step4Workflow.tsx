@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GitBranch, ClipboardList } from "lucide-react";
+import { GitBranch } from "lucide-react";
 
 const CORPORATE_BLUE = "#283578";
 
@@ -16,7 +16,6 @@ const exampleRows = [
 
 export default function Step4Workflow({ data = { benefits: "", rows: [] }, update, isPrint }: any) {
   
-  // Inicializa as 6 linhas editáveis para preenchimento
   const rows = (data.rows && data.rows.length === 6) 
     ? data.rows 
     : Array.from({ length: 6 }).map(() => ({ stage: "", system: "", area: "", data: "", obs: "" }));
@@ -70,140 +69,154 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-4 md:space-y-6 px-2 md:px-0">
       {/* 1. CARD DE INSTRUÇÕES */}
       <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
-            <GitBranch className="w-5 h-5" /> Instruções
+        <CardHeader className="p-4 md:pb-3">
+          <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+            <GitBranch className="w-4 h-4 md:w-5 md:h-5" />
+            Instruções
           </CardTitle>
-          <CardDescription>
-            Descreva os benefícios esperados e mapeie o fluxo completo da ficha técnica no cliente.
+          <CardDescription className="text-xs md:text-sm">
+            Mapeie o fluxo completo da ficha técnica, desde a criação até a ordem de produção.
           </CardDescription>
         </CardHeader>
       </Card>
 
       {/* 2. CARD DE BENEFÍCIOS */}
       <Card>
-        <CardHeader>
-          <CardTitle style={{ color: CORPORATE_BLUE }}>Expectativa do cliente <span className="text-red-500">*</span></CardTitle>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>
+            Expectativa do cliente <span className="text-red-500">*</span>
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
           <Textarea
             rows={5}
             value={data.benefits || ""}
             onChange={(e) => handleBenefitsChange(e.target.value)}
             placeholder="Ex: Eliminação do retrabalho na digitação de fichas técnicas..."
+            className="text-sm md:text-base"
           />
         </CardContent>
       </Card>
 
-      {/* 3. EXEMPLO ILUSTRATIVO RESTAURADO */}
+      {/* 3. EXEMPLO ILUSTRATIVO - Com Scroll Horizontal no Mobile */}
       <Card className="border-accent/30 bg-accent/5">
-        <CardHeader>
-          <CardTitle className="text-base text-slate-900 font-bold flex items-center gap-2">
-             📋 Exemplo Ilustrativo (apenas referência)
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-sm md:text-base text-slate-900 font-bold flex items-center gap-2">
+             📋 Exemplo Ilustrativo
           </CardTitle>
-          <CardDescription className="text-slate-700 font-medium">
-            Esta tabela é apenas um exemplo genérico para servir de inspiração.
-          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-slate-900 font-bold">Etapa</TableHead>
-                <TableHead className="text-slate-900 font-bold">Sistema</TableHead>
-                <TableHead className="text-slate-900 font-bold">Área</TableHead>
-                <TableHead className="text-slate-900 font-bold">Dados Envolvidos</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {exampleRows.map((row) => (
-                <TableRow key={row.stage} className="text-sm border-accent/20">
-                  <TableCell className="font-bold text-slate-800">{row.stage}</TableCell>
-                  <TableCell className="text-slate-700">{row.system}</TableCell>
-                  <TableCell className="text-slate-700">{row.area}</TableCell>
-                  <TableCell className="text-slate-700">{row.data}</TableCell>
+        <CardContent className="p-0 md:p-6">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[600px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-slate-900 font-bold text-xs">Etapa</TableHead>
+                  <TableHead className="text-slate-900 font-bold text-xs">Sistema</TableHead>
+                  <TableHead className="text-slate-900 font-bold text-xs">Área</TableHead>
+                  <TableHead className="text-slate-900 font-bold text-xs">Dados</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {exampleRows.map((row, idx) => (
+                  <TableRow key={idx} className="text-[11px] md:text-sm border-accent/20">
+                    <TableCell className="font-bold text-slate-800">{row.stage}</TableCell>
+                    <TableCell className="text-slate-700">{row.system}</TableCell>
+                    <TableCell className="text-slate-700">{row.area}</TableCell>
+                    <TableCell className="text-slate-700">{row.data}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="md:hidden text-[9px] text-center text-slate-400 py-2 italic">
+            Arraste para o lado para ver mais →
+          </div>
         </CardContent>
       </Card>
 
-      {/* 4. TABELA EDITÁVEL COM ASTERISCOS NAS 4 COLUNAS */}
+      {/* 4. TABELA EDITÁVEL - Com Scroll Horizontal no Mobile */}
       <Card>
-        <CardHeader>
-          <CardTitle style={{ color: CORPORATE_BLUE }}>Fluxo do Cliente <span className="text-red-500">*</span></CardTitle>
-          <CardDescription>As 4 primeiras colunas das 3 primeiras linhas são obrigatórias</CardDescription>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>
+            Fluxo do Cliente <span className="text-red-500">*</span>
+          </CardTitle>
+          <CardDescription className="text-xs">As 4 primeiras colunas das 3 primeiras linhas são obrigatórias</CardDescription>
         </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Etapa</TableHead>
-                <TableHead>Sistema Utilizado</TableHead>
-                <TableHead>Área Responsável</TableHead>
-                <TableHead>Dados Envolvidos</TableHead>
-                <TableHead>Observações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row: any, i: number) => {
-                const isRequired = i < 3;
-                const inputClass = isRequired ? "pr-6 border-orange-200 shadow-sm" : "";
-                
-                return (
-                  <TableRow key={i}>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder={`Etapa ${i + 1}`} 
-                        value={row.stage || ""}
-                        onChange={(e) => handleRowChange(i, "stage", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Sistema" 
-                        value={row.system || ""}
-                        onChange={(e) => handleRowChange(i, "system", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Área" 
-                        value={row.area || ""}
-                        onChange={(e) => handleRowChange(i, "area", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Dados..." 
-                        value={row.data || ""}
-                        onChange={(e) => handleRowChange(i, "data", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Input 
-                        placeholder="Observações" 
-                        value={row.obs || ""}
-                        onChange={(e) => handleRowChange(i, "obs", e.target.value)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+        <CardContent className="p-0 md:p-6">
+          <div className="overflow-x-auto">
+            <Table className="min-w-[800px]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Etapa</TableHead>
+                  <TableHead className="text-xs">Sistema Utilizado</TableHead>
+                  <TableHead className="text-xs">Área Responsável</TableHead>
+                  <TableHead className="text-xs">Dados Envolvidos</TableHead>
+                  <TableHead className="text-xs">Observações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {rows.map((row: any, i: number) => {
+                  const isRequired = i < 3;
+                  const inputClass = `text-xs h-9 ${isRequired ? "pr-6 border-orange-200 shadow-sm" : ""}`;
+                  
+                  return (
+                    <TableRow key={i}>
+                      <TableCell className="p-2 relative min-w-[150px]">
+                        <Input 
+                          placeholder={`Etapa ${i + 1}`} 
+                          value={row.stage || ""}
+                          onChange={(e) => handleRowChange(i, "stage", e.target.value)}
+                          className={inputClass}
+                        />
+                        {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                      </TableCell>
+                      <TableCell className="p-2 relative min-w-[150px]">
+                        <Input 
+                          placeholder="Sistema" 
+                          value={row.system || ""}
+                          onChange={(e) => handleRowChange(i, "system", e.target.value)}
+                          className={inputClass}
+                        />
+                        {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                      </TableCell>
+                      <TableCell className="p-2 relative min-w-[150px]">
+                        <Input 
+                          placeholder="Área" 
+                          value={row.area || ""}
+                          onChange={(e) => handleRowChange(i, "area", e.target.value)}
+                          className={inputClass}
+                        />
+                        {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                      </TableCell>
+                      <TableCell className="p-2 relative min-w-[180px]">
+                        <Input 
+                          placeholder="Dados..." 
+                          value={row.data || ""}
+                          onChange={(e) => handleRowChange(i, "data", e.target.value)}
+                          className={inputClass}
+                        />
+                        {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                      </TableCell>
+                      <TableCell className="p-2 min-w-[150px]">
+                        <Input 
+                          placeholder="Obs" 
+                          value={row.obs || ""}
+                          onChange={(e) => handleRowChange(i, "obs", e.target.value)}
+                          className="text-xs h-9"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="md:hidden text-[9px] text-center text-slate-400 py-2 italic border-t">
+            Arraste a tabela para o lado para preencher todas as colunas →
+          </div>
         </CardContent>
       </Card>
     </div>
