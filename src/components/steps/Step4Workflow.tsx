@@ -33,7 +33,6 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
 
   // --- LOGICA EXCLUSIVA PARA O PDF ---
   if (isPrint) {
-    // Filtra apenas as linhas que possuem a "Etapa" preenchida para não imprimir linhas vazias
     const filledRows = rows.filter((r: any) => r.stage && r.stage.trim() !== "");
 
     return (
@@ -80,10 +79,9 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
     );
   }
 
-  // --- LAYOUT ORIGINAL PARA A TELA ---
+  // --- LAYOUT PARA A TELA ---
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      {/* 1. CARD DE INSTRUÇÕES */}
       <Card className="border-primary/20 bg-primary/5">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
@@ -92,19 +90,18 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
           </CardTitle>
           <CardDescription>
             Descreva os benefícios esperados com a integração e mapeie o fluxo completo da ficha
-            técnica no cliente — desde a criação do modelo até a ordem de produção.
+            técnica no cliente.
           </CardDescription>
         </CardHeader>
       </Card>
 
-      {/* 2. CARD DE BENEFÍCIOS */}
       <Card>
         <CardHeader>
           <CardTitle style={{ color: CORPORATE_BLUE }}>
             Benefícios Esperados <span className="text-red-500">*</span>
           </CardTitle>
           <CardDescription>
-            Descreva os principais benefícios e dores que o cliente espera resolver com a integração
+            Descreva os principais benefícios e dores que o cliente espera resolver
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,31 +109,28 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
             rows={5}
             value={data.benefits || ""}
             onChange={(e) => handleBenefitsChange(e.target.value)}
-            placeholder="Ex: Eliminação do retrabalho na digitação de fichas técnicas, redução de erros na transferência de dados..."
+            placeholder="Ex: Eliminação do retrabalho na digitação de fichas técnicas..."
           />
         </CardContent>
       </Card>
 
-      {/* 3. EXEMPLO ILUSTRATIVO (Cor do texto corrigida para não ficar branca) */}
       <Card className="border-accent/30 bg-accent/5">
         <CardHeader>
           <CardTitle className="text-base text-slate-900 font-bold flex items-center gap-2">
              📋 Exemplo Ilustrativo (apenas referência)
           </CardTitle>
           <CardDescription className="text-slate-700 font-medium">
-            Esta tabela é apenas um <strong>exemplo genérico</strong> para servir de inspiração. 
-            <strong> Preencha o fluxo real do cliente na tabela editável logo abaixo ↓</strong>
+            Preencha o fluxo real do cliente na tabela editável logo abaixo ↓
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-slate-900 font-bold">Etapa</TableHead>
-                <TableHead className="text-slate-900 font-bold">Sistema</TableHead>
-                <TableHead className="text-slate-900 font-bold">Área</TableHead>
-                <TableHead className="text-slate-900 font-bold">Dados Envolvidos</TableHead>
-                <TableHead className="text-slate-900 font-bold">Observações</TableHead>
+                <TableHead className="text-slate-900">Etapa</TableHead>
+                <TableHead className="text-slate-900">Sistema</TableHead>
+                <TableHead className="text-slate-900">Área</TableHead>
+                <TableHead className="text-slate-900">Dados</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -146,7 +140,6 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
                   <TableCell className="text-slate-700">{row.system}</TableCell>
                   <TableCell className="text-slate-700">{row.area}</TableCell>
                   <TableCell className="text-slate-700">{row.data}</TableCell>
-                  <TableCell className="text-slate-500 italic">{row.obs}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -154,13 +147,12 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
         </CardContent>
       </Card>
 
-      {/* 4. TABELA EDITÁVEL */}
       <Card>
         <CardHeader>
           <CardTitle style={{ color: CORPORATE_BLUE }}>
             Fluxo do Cliente <span className="text-red-500">*</span>
           </CardTitle>
-          <CardDescription>Preencha com o fluxo real do cliente (mínimo 3 etapas)</CardDescription>
+          <CardDescription>As 3 primeiras linhas são obrigatórias para prosseguir</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -174,45 +166,54 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((row: any, i: number) => (
-                <TableRow key={i}>
-                  <TableCell className="p-2">
-                    <Input 
-                      placeholder={`Etapa ${i + 1}`} 
-                      value={row.stage || ""}
-                      onChange={(e) => handleRowChange(i, "stage", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-2">
-                    <Input 
-                      placeholder="Ex: Audaces / ERP" 
-                      value={row.system || ""}
-                      onChange={(e) => handleRowChange(i, "system", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-2">
-                    <Input 
-                      placeholder="Ex: Engenharia" 
-                      value={row.area || ""}
-                      onChange={(e) => handleRowChange(i, "area", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-2">
-                    <Input 
-                      placeholder="Ex: Materiais..." 
-                      value={row.data || ""}
-                      onChange={(e) => handleRowChange(i, "data", e.target.value)}
-                    />
-                  </TableCell>
-                  <TableCell className="p-2">
-                    <Input 
-                      placeholder="Observações" 
-                      value={row.obs || ""}
-                      onChange={(e) => handleRowChange(i, "obs", e.target.value)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {rows.map((row: any, i: number) => {
+                const isRequired = i < 3; // Define as 3 primeiras linhas como obrigatórias
+                return (
+                  <TableRow key={i}>
+                    <TableCell className="p-2 relative">
+                      <Input 
+                        placeholder={`Etapa ${i + 1}`} 
+                        value={row.stage || ""}
+                        onChange={(e) => handleRowChange(i, "stage", e.target.value)}
+                        className={isRequired ? "pr-6 border-orange-200" : ""}
+                      />
+                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
+                    </TableCell>
+                    <TableCell className="p-2 relative">
+                      <Input 
+                        placeholder="Sistema" 
+                        value={row.system || ""}
+                        onChange={(e) => handleRowChange(i, "system", e.target.value)}
+                        className={isRequired ? "pr-6 border-orange-200" : ""}
+                      />
+                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
+                    </TableCell>
+                    <TableCell className="p-2 relative">
+                      <Input 
+                        placeholder="Área" 
+                        value={row.area || ""}
+                        onChange={(e) => handleRowChange(i, "area", e.target.value)}
+                        className={isRequired ? "pr-6 border-orange-200" : ""}
+                      />
+                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
+                    </TableCell>
+                    <TableCell className="p-2">
+                      <Input 
+                        placeholder="Dados..." 
+                        value={row.data || ""}
+                        onChange={(e) => handleRowChange(i, "data", e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell className="p-2">
+                      <Input 
+                        placeholder="Obs" 
+                        value={row.obs || ""}
+                        onChange={(e) => handleRowChange(i, "obs", e.target.value)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
