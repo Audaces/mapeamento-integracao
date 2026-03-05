@@ -13,7 +13,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 213 30% 15%;
 
-    --primary: 213 80% 45%;
+    /* Ajuste do Primary para o azul Audaces #283578 */
+    --primary: 230 50% 31%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 30% 93%;
@@ -30,65 +31,23 @@
 
     --border: 213 20% 88%;
     --input: 213 20% 88%;
-    --ring: 213 80% 45%;
+    --ring: 230 50% 31%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 213 30% 15%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 196 70% 55%;
+    /* Cores da Sidebar sintonizadas com a marca */
+    --sidebar-background: 0 0% 100%; /* Fundo branco conforme seu MappingLayout */
+    --sidebar-foreground: 213 30% 15%;
+    --sidebar-primary: 230 50% 31%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 25% 22%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 213 25% 25%;
-    --sidebar-ring: 196 70% 55%;
+    --sidebar-accent: 210 30% 96%;
+    --sidebar-accent-foreground: 230 50% 31%;
+    --sidebar-border: 213 20% 92%;
+    --sidebar-ring: 230 50% 31%;
 
-    --step-active: 213 80% 45%;
+    --step-active: 230 50% 31%;
     --step-complete: 160 60% 45%;
     --step-pending: 213 15% 75%;
-  }
-
-  .dark {
-    --background: 213 30% 10%;
-    --foreground: 210 20% 95%;
-
-    --card: 213 30% 13%;
-    --card-foreground: 210 20% 95%;
-
-    --popover: 213 30% 13%;
-    --popover-foreground: 210 20% 95%;
-
-    --primary: 213 80% 55%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 213 25% 20%;
-    --secondary-foreground: 210 20% 95%;
-
-    --muted: 213 25% 18%;
-    --muted-foreground: 213 15% 60%;
-
-    --accent: 196 70% 50%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62% 30%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 213 25% 22%;
-    --input: 213 25% 22%;
-    --ring: 213 80% 55%;
-
-    --sidebar-background: 213 30% 8%;
-    --sidebar-foreground: 210 20% 90%;
-    --sidebar-primary: 196 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 25% 15%;
-    --sidebar-accent-foreground: 210 20% 95%;
-    --sidebar-border: 213 25% 15%;
-    --sidebar-ring: 196 70% 55%;
-
-    --step-active: 213 80% 55%;
-    --step-complete: 160 60% 50%;
-    --step-pending: 213 15% 40%;
   }
 }
 
@@ -98,6 +57,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -129,7 +90,7 @@
     break-before: page !important;
     display: block !important;
     width: 100% !important;
-    padding-top: 1cm;
+    padding-top: 0.5cm;
     clear: both;
   }
 
@@ -147,32 +108,45 @@
     overflow: visible !important;
   }
 
-  body {
+  /* Garante que a logo e cores apareçam no PDF */
+  * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
 
   /* Impede que tabelas e cards quebrem ao meio entre páginas */
   table, tr, td, .card {
     page-break-inside: avoid !important;
   }
+  
+  /* Ajuste de inputs para parecerem texto no PDF */
+  input, textarea {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
 }
 
 /* --- AJUSTES VISUAIS DA TELA --- */
 
-/* Escurece o cinza dos passos inativos na barra lateral para melhor leitura */
+/* Escurece o cinza dos passos inativos na barra lateral (#4b5563) */
 .text-gray-600, 
 .text-muted-foreground, 
 button span:last-child {
   color: #4b5563 !important;
 }
 
-/* Helper para o azul corporativo #283578 */
+/* Classes auxiliares para a marca */
 .text-corporate-blue {
   color: #283578;
 }
 
 .bg-corporate-blue {
   background-color: #283578;
+}
+
+/* Garante que a logo não distorça */
+img {
+  max-width: 100%;
+  height: auto;
 }
