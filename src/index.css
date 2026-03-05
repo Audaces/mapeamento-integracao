@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 213 30% 15%;
 
-    /* Ajuste do Primary para o azul Audaces #283578 */
+    /* Azul Audaces #283578 em formato HSL */
     --primary: 230 50% 31%;
     --primary-foreground: 0 0% 100%;
 
@@ -35,8 +35,7 @@
 
     --radius: 0.5rem;
 
-    /* Cores da Sidebar sintonizadas com a marca */
-    --sidebar-background: 0 0% 100%; /* Fundo branco conforme seu MappingLayout */
+    --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 213 30% 15%;
     --sidebar-primary: 230 50% 31%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -69,7 +68,8 @@
     margin: 1.5cm;
   }
 
-  /* 1. ESCONDE O CARD DE SUCESSO E ELEMENTOS DE TELA */
+  /* 1. ESCONDE O CARD DE SUCESSO E ELEMENTOS DE INTERFACE */
+  /* O !important garante que o navegador não ignore o comando */
   .no-print, 
   aside, 
   header, 
@@ -78,65 +78,61 @@
   .lovable-badge, 
   [data-lovable-badge], 
   #lovable-badge,
-  .fixed.bottom-4.right-4 {
+  .fixed {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
   }
 
-  /* 2. FORÇA A QUEBRA DE PÁGINA EM CADA ETAPA */
+  /* 2. FORÇA A QUEBRA DE PÁGINA ENTRE OS STEPS */
   .pdf-page {
     page-break-before: always !important;
     break-before: page !important;
     display: block !important;
     width: 100% !important;
-    padding-top: 0.5cm;
+    padding-top: 1cm;
     clear: both;
+    position: relative;
   }
 
-  /* Impede página em branco antes da primeira etapa */
+  /* Impede que a primeira página saia em branco */
   .pdf-page:first-child {
     page-break-before: avoid !important;
     break-before: avoid !important;
     padding-top: 0;
   }
 
-  /* 3. RESET DE LAYOUT PARA PDF */
+  /* 3. CONFIGURAÇÕES GERAIS DO DOCUMENTO PDF */
   body, html {
     background-color: white !important;
     height: auto !important;
     overflow: visible !important;
   }
 
-  /* Garante que a logo e cores apareçam no PDF */
+  /* Garante cores e fundos (Ex: Logo e Cards coloridos) */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Impede que tabelas e cards quebrem ao meio entre páginas */
-  table, tr, td, .card {
+  /* Impede que tabelas ou cards fiquem cortados entre duas páginas */
+  table, tr, td, .card, section {
     page-break-inside: avoid !important;
-  }
-  
-  /* Ajuste de inputs para parecerem texto no PDF */
-  input, textarea {
-    border: none !important;
-    padding: 0 !important;
-    background: transparent !important;
+    break-inside: avoid !important;
   }
 }
 
-/* --- AJUSTES VISUAIS DA TELA --- */
+/* --- AJUSTES VISUAIS PARA A TELA (DESKTOP) --- */
 
 /* Escurece o cinza dos passos inativos na barra lateral (#4b5563) */
 .text-gray-600, 
 .text-muted-foreground, 
+.text-gray-400,
 button span:last-child {
   color: #4b5563 !important;
 }
 
-/* Classes auxiliares para a marca */
+/* Classes para uso rápido do azul Audaces */
 .text-corporate-blue {
   color: #283578;
 }
@@ -145,8 +141,9 @@ button span:last-child {
   background-color: #283578;
 }
 
-/* Garante que a logo não distorça */
+/* Garante que imagens e logos não distorçam */
 img {
   max-width: 100%;
   height: auto;
+  display: block;
 }
