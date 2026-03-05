@@ -1,163 +1,208 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { GitBranch } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Monitor, Plus } from "lucide-react";
 
 const CORPORATE_BLUE = "#283578";
 
-export default function Step4Workflow({ data = { benefits: "", rows: [] }, update, isPrint }: any) {
-  
-  const rows = data.rows?.length === 6 ? data.rows : Array.from({ length: 6 }).map(() => ({
-    stage: "", system: "", area: "", data: "", obs: ""
-  }));
+// Restaurando todas as categorias e sugestões de campos originais
+const categories = [
+  { key: "produto", label: "Produto", fields: ["Referência", "Descrição", "Coleção", "Linha", "Grupo", "Subgrupo"] },
+  { key: "materiais", label: "Materiais", fields: ["Código", "Descrição", "Unidade", "Consumo", "Fornecedor", "Composição"] },
+  { key: "operacoes", label: "Operações / Serviços", fields: ["Operação", "Setor", "Tempo padrão", "Máquina", "Sequência"] },
+  { key: "outros", label: "Outros Cadastros", fields: ["Campo", "Descrição", "Valor padrão", "Origem do dado"] },
+];
 
-  const handleRowChange = (index: number, field: string, value: string) => {
-    const newRows = [...rows];
-    newRows[index] = { ...newRows[index], [field]: value };
-    update({ ...data, rows: newRows });
+const dataTypes = ["Texto", "Número", "Data", "Lista/Enum", "Booleano", "Código"];
+
+export default function Step5ErpScreens({ data = [], update, isPrint }: any) {
+  const [localRows, setLocalRows] = useState<any[]>(data.length > 0 ? data : []);
+
+  useEffect(() => {
+    if (localRows.length === 0) {
+      // Inicializa com as sugestões originais para cada categoria
+      const initial = categories.flatMap(cat => 
+        cat.fields.slice(0, 5).map(f => ({ 
+          category: cat.key, 
+          categoryLabel: cat.label,
+          tela: "", 
+          campo: f, 
+          tipo: "", 
+          obrigatorio: "" 
+        }))
+      );
+      setLocalRows(initial);
+      update(initial);
+    }
+  }, []);
+
+  const handleInputChange = (index: number, field: string, value: string) => {
+    const updated = [...localRows];
+    if (!updated[index]) return;
+    updated[index][field] = value;
+    setLocalRows(updated);
+    const filledRows = updated.filter(row => row.tela && row.tela.trim() !== "");
+    update(filledRows);
   };
 
-  const handleBenefitsChange = (val: string) => {
-    update({ ...data, benefits: val });
+  const addRow = (categoryKey: string, categoryLabel: string) => {
+    const newRow = { category: categoryKey, categoryLabel, tela: "", campo: "", tipo: "", obrigatorio: "" };
+    const updated = [...localRows, newRow];
+    setLocalRows(updated);
   };
 
   if (isPrint) {
-    const filledRows = rows.filter((r: any) => r.stage && r.stage.trim() !== "");
+    const rowsToPrint = localRows.filter(r => r.tela && r.tela.trim() !== "");
     return (
-      <div className="space-y-8">
-        <div className="border-b-2 pb-2" style={{ borderColor: CORPORATE_BLUE }}>
-          <h2 className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>2. Fluxo da Ficha e Benefícios</h2>
-        </div>
-        <div className="space-y-2">
-          <h3 className="font-bold text-sm" style={{ color: CORPORATE_BLUE }}>Benefícios Esperados:</h3>
-          <p className="text-sm whitespace-pre-wrap text-slate-700">{data.benefits || "Não informado"}</p>
-        </div>
-        <div className="space-y-4">
-          <h3 className="font-bold text-sm" style={{ color: CORPORATE_BLUE }}>Fluxo do Cliente:</h3>
+      <div className="space-y-6">
+        <h3 className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>3. Telas e Campos do ERP</h3>
+        {rowsToPrint.length > 0 ? (
           <Table>
             <TableHeader>
               <TableRow className="border-b border-slate-300">
-                <TableHead className="text-black font-bold">Etapa</TableHead>
-                <TableHead className="text-black font-bold">Sistema</TableHead>
-                <TableHead className="text-black font-bold">Área</TableHead>
-                <TableHead className="text-black font-bold">Dados</TableHead>
+                <TableHead className="text-black font-bold">Categoria</TableHead>
+                <TableHead className="text-black font-bold">Módulo / Tela</TableHead>
+                <TableHead className="text-black font-bold">Campo no ERP</TableHead>
+                <TableHead className="text-black font-bold">Tipo / Obrig.</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filledRows.map((row: any, i: number) => (
+              {rowsToPrint.map((row, i) => (
                 <TableRow key={i} className="border-b border-slate-100">
-                  <TableCell className="font-medium text-slate-900">{row.stage}</TableCell>
-                  <TableCell>{row.system}</TableCell>
-                  <TableCell>{row.area}</TableCell>
-                  <TableCell>{row.data}</TableCell>
+                  <TableCell className="font-bold text-slate-900">{row.categoryLabel || row.category}</TableCell>
+                  <TableCell>{row.tela}</TableCell>
+                  <TableCell>{row.campo}</TableCell>
+                  <TableCell>{row.tipo} ({row.obrigatorio === 'S' ? 'Sim' : 'Não'})</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        ) : (
+          <p className="text-slate-500 italic text-sm">Nenhuma tela ou campo mapeado.</p>
+        )}
       </div>
     );
   }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <Card className="border-primary/20 bg-primary/5">
+      <Card className="border-primary/20 bg-primary/5 no-print">
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
-            <GitBranch className="w-5 h-5" /> Instruções
+            <Monitor className="w-5 h-5" /> Instruções
           </CardTitle>
           <CardDescription>
-            Descreva os benefícios e mapeie o fluxo completo da ficha técnica no cliente.
+            Para cada categoria, liste as telas e campos do ERP. As 3 primeiras linhas de cada aba são obrigatórias.
           </CardDescription>
         </CardHeader>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle style={{ color: CORPORATE_BLUE }}>Benefícios Esperados <span className="text-red-500">*</span></CardTitle>
+          <CardTitle style={{ color: CORPORATE_BLUE }}>Telas e Campos do ERP</CardTitle>
         </CardHeader>
         <CardContent>
-          <Textarea
-            rows={5}
-            value={data.benefits || ""}
-            onChange={(e) => handleBenefitsChange(e.target.value)}
-            placeholder="Descreva os benefícios esperados..."
-          />
-        </CardContent>
-      </Card>
+          <Tabs defaultValue="produto">
+            <TabsList className="flex flex-wrap h-auto gap-1 bg-slate-100 p-1 mb-4">
+              {categories.map((cat) => (
+                <TabsTrigger key={cat.key} value={cat.key} className="text-xs px-4 font-bold uppercase tracking-tight">
+                  {cat.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
 
-      <Card>
-        <CardHeader>
-          <CardTitle style={{ color: CORPORATE_BLUE }}>Fluxo do Cliente <span className="text-red-500">*</span></CardTitle>
-          <CardDescription>As 4 primeiras colunas das 3 primeiras linhas são obrigatórias</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Etapa</TableHead>
-                <TableHead>Sistema Utilizado</TableHead>
-                <TableHead>Área Responsável</TableHead>
-                <TableHead>Dados Envolvidos</TableHead>
-                <TableHead>Observações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row: any, i: number) => {
-                const isRequired = i < 3;
-                const inputClass = isRequired ? "pr-6 border-orange-200 shadow-sm" : "";
-                
-                return (
-                  <TableRow key={i}>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder={`Etapa ${i + 1}`} 
-                        value={row.stage || ""}
-                        onChange={(e) => handleRowChange(i, "stage", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Sistema" 
-                        value={row.system || ""}
-                        onChange={(e) => handleRowChange(i, "system", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Área" 
-                        value={row.area || ""}
-                        onChange={(e) => handleRowChange(i, "area", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2 relative">
-                      <Input 
-                        placeholder="Dados..." 
-                        value={row.data || ""}
-                        onChange={(e) => handleRowChange(i, "data", e.target.value)}
-                        className={inputClass}
-                      />
-                      {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold">*</span>}
-                    </TableCell>
-                    <TableCell className="p-2">
-                      <Input 
-                        placeholder="Observações" 
-                        value={row.obs || ""}
-                        onChange={(e) => handleRowChange(i, "obs", e.target.value)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+            {categories.map((cat) => {
+              let categoryRowCount = 0;
+              return (
+                <TabsContent key={cat.key} value={cat.key} className="animate-in fade-in duration-300">
+                  {/* Restaurando os textos explicativos de sugestão */}
+                  <div className="mb-4 p-3 bg-slate-50 border rounded-md">
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      Sugestões para <strong>{cat.label}</strong>: <span className="italic">{cat.fields.join(", ")}</span>
+                    </p>
+                  </div>
+                  
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="text-slate-900">Módulo / Tela</TableHead>
+                        <TableHead className="text-slate-900">Campo no ERP</TableHead>
+                        <TableHead className="text-slate-900">Tipo de Dado</TableHead>
+                        <TableHead className="w-24 text-slate-900">Obrig.</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {localRows.map((row, i) => {
+                        if (row.category !== cat.key) return null;
+                        const isRequired = categoryRowCount < 3;
+                        categoryRowCount++;
+                        const inputClass = isRequired ? "pr-6 border-orange-200 shadow-sm" : "text-xs";
+
+                        return (
+                          <TableRow key={i}>
+                            <TableCell className="p-2 relative">
+                              <Input 
+                                placeholder="Módulo" 
+                                className={inputClass} 
+                                value={row.tela || ""}
+                                onChange={(e) => handleInputChange(i, "tela", e.target.value)}
+                              />
+                              {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                            </TableCell>
+                            <TableCell className="p-2 relative">
+                              <Input 
+                                placeholder="Nome do campo" 
+                                className={inputClass} 
+                                value={row.campo || ""}
+                                onChange={(e) => handleInputChange(i, "campo", e.target.value)}
+                              />
+                              {isRequired && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs">*</span>}
+                            </TableCell>
+                            <TableCell className="p-2 relative">
+                              <Select value={row.tipo || ""} onValueChange={(v) => handleInputChange(i, "tipo", v)}>
+                                <SelectTrigger className={`h-9 text-xs ${isRequired ? "border-orange-200 shadow-sm" : ""}`}>
+                                  <SelectValue placeholder="Tipo" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {dataTypes.map((t) => (<SelectItem key={t} value={t}>{t}</SelectItem>))}
+                                </SelectContent>
+                              </Select>
+                              {isRequired && <span className="absolute right-8 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs z-10">*</span>}
+                            </TableCell>
+                            <TableCell className="p-2 relative">
+                              <Select value={row.obrigatorio || ""} onValueChange={(v) => handleInputChange(i, "obrigatorio", v)}>
+                                <SelectTrigger className={`h-9 text-xs ${isRequired ? "border-orange-200 shadow-sm" : ""}`}>
+                                  <SelectValue placeholder="S/N" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="S">Sim</SelectItem>
+                                  <SelectItem value="N">Não</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {isRequired && <span className="absolute right-8 top-1/2 -translate-y-1/2 text-red-500 font-bold text-xs z-10">*</span>}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 border-dashed border-slate-300 w-full text-xs font-semibold"
+                    onClick={() => addRow(cat.key, cat.label)}
+                  >
+                    <Plus className="w-4 h-4 mr-1" /> Adicionar linha em {cat.label}
+                  </Button>
+                </TabsContent>
+              );
+            })}
+          </Tabs>
         </CardContent>
       </Card>
     </div>
