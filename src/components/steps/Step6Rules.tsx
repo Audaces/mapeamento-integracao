@@ -37,7 +37,7 @@ export default function Step6Rules({ data = { erpPrints: "", fichaModel: "", che
           <h2 className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>4. Documentos e Checklist Final</h2>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 text-sm">
+        <div className="space-y-4 text-sm">
           <div>
             <h3 className="font-bold text-slate-800">Links de Referência:</h3>
             <div className="mt-2 space-y-2">
@@ -66,72 +66,77 @@ export default function Step6Rules({ data = { erpPrints: "", fichaModel: "", che
     );
   }
 
-  // --- LAYOUT ORIGINAL PARA A TELA ---
+  // --- LAYOUT RESPONSIVO PARA A TELA ---
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-4 md:space-y-6 px-2 md:px-0">
       {/* Instruções */}
       <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
-            <BookOpen className="w-5 h-5" />
+        <CardHeader className="p-4 md:pb-3">
+          <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+            <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
             Instruções
           </CardTitle>
-          <CardDescription>
-            Adicione links para prints das telas do ERP e o modelo de ficha técnica do cliente.
-            Ao final, valide o mapeamento com o checklist de verificação.
+          <CardDescription className="text-xs md:text-sm">
+            Adicione os links de referência e valide o mapeamento com o checklist final.
           </CardDescription>
         </CardHeader>
       </Card>
 
       {/* Links de Documentos */}
       <Card>
-        <CardHeader>
-          <CardTitle style={{ color: CORPORATE_BLUE }}>Documentos e Referências</CardTitle>
-          <CardDescription>
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>Documentos e Referências</CardTitle>
+          <CardDescription className="text-xs md:text-sm">
             Links para prints do ERP e modelo de ficha do cliente
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Label className="text-sm">Print das telas do ERP</Label>
+        <CardContent className="p-4 md:p-6 pt-0 md:pt-0 space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs md:text-sm font-semibold">Print das telas do ERP</Label>
             <Input 
               placeholder="Cole o link ou caminho do documento..." 
               value={data.erpPrints || ""}
               onChange={(e) => handleInputChange("erpPrints", e.target.value)}
+              className="h-10 md:h-11 text-sm"
             />
           </div>
-          <div className="space-y-1">
-            <Label className="text-sm">Modelo de ficha técnica do cliente</Label>
+          <div className="space-y-2">
+            <Label className="text-xs md:text-sm font-semibold">Modelo de ficha técnica do cliente</Label>
             <Input 
               placeholder="Cole o link ou caminho do documento..." 
               value={data.fichaModel || ""}
               onChange={(e) => handleInputChange("fichaModel", e.target.value)}
+              className="h-10 md:h-11 text-sm"
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Checklist de Validação */}
-      <Card className="border-[hsl(var(--step-complete))]/30 bg-[hsl(var(--step-complete))]/5">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2" style={{ color: "hsl(var(--step-complete))" }}>
+      <Card className="border-[hsl(var(--step-complete))]/30 bg-[hsl(var(--step-complete))]/5 mb-6">
+        <CardHeader className="p-4 md:p-6">
+          <CardTitle className="text-base md:text-lg flex items-center gap-2" style={{ color: "hsl(var(--step-complete))" }}>
             <CheckSquare className="w-5 h-5" />
             Checklist de Mapeamento
           </CardTitle>
-          <CardDescription>
-            Confirme que todos os itens foram verificados antes de finalizar o mapeamento
+          <CardDescription className="text-xs md:text-sm">
+            Confirme os itens antes de finalizar
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-3">
+        <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
+          <div className="grid gap-4">
             {validationChecklist.map((item) => (
-              <div key={item} className="flex items-start gap-2">
+              <div key={item} className="flex items-start gap-3 group">
                 <Checkbox 
                   id={item} 
                   checked={!!data.checklist[item]}
                   onCheckedChange={(checked) => handleCheckChange(item, !!checked)}
+                  className="mt-1 h-5 w-5 md:h-4 md:w-4 border-slate-400"
                 />
-                <Label htmlFor={item} className="text-sm font-normal leading-snug cursor-pointer">
+                <Label 
+                  htmlFor={item} 
+                  className="text-sm md:text-base font-medium leading-relaxed cursor-pointer select-none text-slate-700 group-hover:text-slate-900 transition-colors"
+                >
                   {item}
                 </Label>
               </div>
