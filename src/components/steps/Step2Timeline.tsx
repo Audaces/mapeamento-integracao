@@ -2,49 +2,77 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CalendarDays } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { CalendarDays, TrendingUp } from "lucide-react";
+
+const CORPORATE_BLUE = "#283578";
 
 const defaultPhases = [
-  { phase: "Mapeamento de Dados", hint: "Levantamento de todos os dados e fluxos envolvidos na integração" },
-  { phase: "Desenvolvimento", hint: "Construção dos conectores e adaptadores entre Audaces e ERP" },
-  { phase: "Testes Internos", hint: "Validação interna com dados de teste antes de envolver o cliente" },
-  { phase: "Homologação", hint: "Testes com o cliente utilizando dados reais em ambiente controlado" },
-  { phase: "Treinamento", hint: "Capacitação da equipe do cliente no uso da integração" },
-  { phase: "Go-live", hint: "Ativação em produção com acompanhamento próximo" },
-  { phase: "Acompanhamento Pós-go-live", hint: "Suporte intensivo nos primeiros dias/semanas após ativação" },
+  { phase: "Mapeamento de Dados", hint: "Levantamento de todos os dados e fluxos" },
+  { phase: "Desenvolvimento", hint: "Construção dos conectores e adaptadores" },
+  { phase: "Testes Internos", hint: "Validação interna com dados de teste" },
+  { phase: "Homologação", hint: "Testes com o cliente utilizando dados reais" },
+  { phase: "Treinamento", hint: "Capacitação da equipe do cliente" },
+  { phase: "Go-live", hint: "Ativação em produção" },
+  { phase: "Acompanhamento", hint: "Suporte intensivo pós-ativação" },
 ];
 
 const statusOptions = ["Não iniciado", "Em andamento", "Concluído", "Bloqueado"];
 
-function statusColor(status: string) {
-  switch (status) {
-    case "Concluído": return "bg-[hsl(var(--step-complete))] text-white";
-    case "Em andamento": return "bg-[hsl(var(--step-active))] text-white";
-    case "Bloqueado": return "bg-destructive text-destructive-foreground";
-    default: return "bg-muted text-muted-foreground";
-  }
-}
+export default function Step2Timeline({ data = { rows: [], beneficios: "" }, update, isPrint }: any) {
+  
+  // Inicializa as linhas se estiverem vazias
+  const rows = data.rows?.length > 0 ? data.rows : defaultPhases.map(p => ({ ...p, inicio: "", fim: "", status: "Não iniciado" }));
 
-export default function Step2Timeline() {
+  const handleRowChange = (index: number, field: string, value: string) => {
+    const newRows = [...rows];
+    newRows[index][field] = value;
+    update({ ...data, rows: newRows });
+  };
+
+  const handleBenefitsChange = (val: string) => {
+    update({ ...data, beneficios: val });
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <CalendarDays className="w-5 h-5 text-primary" />
-            Instruções
-          </CardTitle>
-          <CardDescription>
-            Preencha as datas de início e conclusão previstas para cada etapa. O status deve
-            ser atualizado conforme o projeto avança. As etapas já vêm pré-preenchidas como sugestão.
-          </CardDescription>
-        </CardHeader>
-      </Card>
+      {/* Instruções */}
+      {!isPrint && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+              <CalendarDays className="w-5 h-5" /> Instruções
+            </CardTitle>
+            <CardDescription>
+              Preencha as datas previstas e o status para cada etapa. Adicione também os benefícios esperados.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
 
+      {/* Novo Campo: Benefícios Previstos */}
       <Card>
         <CardHeader>
-          <CardTitle>Cronograma de Implantação</CardTitle>
+          <CardTitle className="text-md flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+            <TrendingUp className="w-4 h-4" /> Benefícios Previstos <span className="text-red-500">*</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Textarea 
+            placeholder="Descreva quais benefícios/ganhos o cliente espera com esta integração..."
+            value={data.beneficios || ""}
+            onChange={(e) => handleBenefitsChange(e.target.value)}
+            className={isPrint ? "border-none p-0" : "min-h-[80px]"}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Tabela de Cronograma */}
+      <Card className={isPrint ? "border-none shadow-none" : ""}>
+        <CardHeader>
+          <CardTitle style={{ color: CORPORATE_BLUE }}>Cronograma de Implantação</CardTitle>
+          <p className="text-xs text-muted-foreground">Preencha ao menos 3 datas para prosseguir <span className="text-red-500">*</span></p>
         </CardHeader>
         <CardContent>
           <Table>
@@ -57,31 +85,46 @@ export default function Step2Timeline() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {defaultPhases.map((item) => (
+              {rows.map((item: any, index: number) => (
                 <TableRow key={item.phase}>
                   <TableCell>
                     <div>
                       <span className="font-medium text-sm">{item.phase}</span>
-                      <p className="text-xs text-muted-foreground mt-0.5">{item.hint}</p>
+                      {!isPrint && <p className="text-xs text-muted-foreground mt-0.5">{item.hint}</p>}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Input type="date" className="w-36" />
+                    <Input 
+                      type="date" 
+                      className="w-36" 
+                      value={item.inicio || ""} 
+                      onChange={(e) => handleRowChange(index, "inicio", e.target.value)}
+                    />
                   </TableCell>
                   <TableCell>
-                    <Input type="date" className="w-36" />
+                    <Input 
+                      type="date" 
+                      className="w-36" 
+                      value={item.fim || ""} 
+                      onChange={(e) => handleRowChange(index, "fim", e.target.value)}
+                    />
                   </TableCell>
                   <TableCell>
-                    <Select defaultValue="Não iniciado">
-                      <SelectTrigger className="w-36">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statusOptions.map((s) => (
-                          <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {isPrint ? <span>{item.status}</span> : (
+                      <Select 
+                        value={item.status || "Não iniciado"} 
+                        onValueChange={(v) => handleRowChange(index, "status", v)}
+                      >
+                        <SelectTrigger className="w-36">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((s) => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
