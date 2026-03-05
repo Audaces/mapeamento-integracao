@@ -159,3 +159,19 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
                       onChange={(e) => handleRowChange(i, "data", e.target.value)}
                     />
                   </TableCell>
+                  <TableCell className="p-2">
+                    <Input 
+                      placeholder="Observações" 
+                      value={row.obs || ""}
+                      onChange={(e) => handleRowChange(i, "obs", e.target.value)}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
