@@ -79,7 +79,9 @@ export default function MappingLayout() {
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-in zoom-in duration-300">
-        <div className="bg-white p-10 rounded-xl shadow-xl border border-slate-200 text-center max-w-lg w-full">
+        
+        {/* CARD DE SUCESSO - AJUSTADO COM NO-PRINT PARA NÃO SAIR NO PDF */}
+        <div className="no-print bg-white p-10 rounded-xl shadow-xl border border-slate-200 text-center max-w-lg w-full mb-10">
           <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <FileCheck className="w-10 h-10" />
           </div>
@@ -100,14 +102,17 @@ export default function MappingLayout() {
           </div>
         </div>
 
-        {/* ESTRUTURA PARA O PDF (Sempre presente, mas oculta na tela) */}
+        {/* ESTRUTURA PARA O PDF - SÓ APARECE NA IMPRESSÃO */}
         <div className="hidden print:block bg-white w-full">
-            <div className="p-12">
-              <section className="pdf-page"><Step1Identification data={formData.step1} isPrint /></section>
-              <section className="pdf-page"><Step4Workflow data={formData.step2} isPrint /></section>
-              <section className="pdf-page"><Step5ErpScreens data={formData.step3} isPrint /></section>
-              <section className="pdf-page"><Step6Rules data={formData.step4} isPrint /></section>
+            <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
+               <h1 className="text-4xl font-bold" style={{ color: CORPORATE_BLUE }}>Audaces</h1>
+               <p className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>Relatório de Mapeamento de Dados ERP</p>
             </div>
+
+            <section className="pdf-page px-12"><Step1Identification data={formData.step1} isPrint /></section>
+            <section className="pdf-page px-12"><Step4Workflow data={formData.step2} isPrint /></section>
+            <section className="pdf-page px-12"><Step5ErpScreens data={formData.step3} isPrint /></section>
+            <section className="pdf-page px-12"><Step6Rules data={formData.step4} isPrint /></section>
         </div>
       </div>
     );
