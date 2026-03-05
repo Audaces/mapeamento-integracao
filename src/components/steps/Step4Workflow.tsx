@@ -39,7 +39,7 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
           <h2 className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>2. Fluxo da Ficha e Benefícios</h2>
         </div>
         <div className="space-y-2">
-          <h3 className="font-bold text-sm" style={{ color: CORPORATE_BLUE }}>Benefícios Esperados:</h3>
+          <h3 className="font-bold text-sm" style={{ color: CORPORATE_BLUE }}>Expectativa do cliente:</h3>
           <p className="text-sm whitespace-pre-wrap text-slate-700">{data.benefits || "Não informado"}</p>
         </div>
         <div className="space-y-4">
