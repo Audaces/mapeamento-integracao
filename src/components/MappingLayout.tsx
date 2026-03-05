@@ -96,7 +96,7 @@ export default function MappingLayout() {
             </div>
             
             {/* LOGO AUDACES NA TELA DE SUCESSO */}
-            <img src="/logo-audaces.png" alt="Audaces" className="h-10 mx-auto mb-4 object-contain" />
+            <img src="logo-audaces.png" alt="Audaces" className="h-10 mx-auto mb-4 object-contain" />
             
             <h1 className="text-2xl font-bold mb-2" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
             <p className="text-gray-600 mb-8">Todos os dados foram coletados com sucesso. Gere agora o seu PDF.</p>
@@ -120,7 +120,7 @@ export default function MappingLayout() {
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
                {/* LOGO AUDACES NO CABEÇALHO DO PDF */}
-               <img src="/logo-audaces.png" alt="Audaces" className="h-14 mb-4 object-contain" />
+               <img src="logo-audaces.png" alt="Audaces" className="h-14 mb-4 object-contain" />
                <p className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>Relatório de Mapeamento de Dados ERP</p>
                <p className="text-xs text-gray-400 mt-2">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
             </div>
@@ -140,7 +140,7 @@ export default function MappingLayout() {
       <aside className="no-print w-64 shrink-0 bg-white flex flex-col border-r">
         <div className="pt-4 pb-3 px-4 border-b">
           {/* LOGO AUDACES NA SIDEBAR */}
-          <img src="/logo-audaces.png" alt="Audaces" className="h-8 w-auto mb-2 object-contain" />
+          <img src="logo-audaces.png" alt="Audaces" className="h-8 w-auto mb-2 object-contain" />
           <p className="text-[10px] font-bold" style={{ color: CORPORATE_BLUE }}>Mapeamento de Dados ERP</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
