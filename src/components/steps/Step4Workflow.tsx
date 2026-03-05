@@ -87,15 +87,18 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
       <Card>
         <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>
-            Expectativa do cliente <span className="text-red-500">*</span>
+            Benefícios Esperados <span className="text-red-500">*</span>
           </CardTitle>
+          <CardDescription className="text-xs md:text-sm">
+            Descreva os principais benefícios e dores que o cliente espera resolver com a integração
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
           <Textarea
             rows={5}
             value={data.benefits || ""}
             onChange={(e) => handleBenefitsChange(e.target.value)}
-            placeholder="Ex: Eliminação do retrabalho na digitação de fichas técnicas..."
+            placeholder="Ex: Eliminação do retrabalho na digitação de fichas técnicas, redução de erros na transferência de dados, rastreabilidade de materiais, padronização de cadastros, agilidade na geração de ordens de produção..."
             className="text-sm md:text-base"
           />
         </CardContent>
