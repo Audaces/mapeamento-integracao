@@ -142,7 +142,7 @@ export default function MappingLayout() {
 
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
-               <img src="logo-audaces.png" alt="Audaces" className="h-16 mb-4 object-contain" />
+               <img src="logo-audaces.png" alt="Audaces" className="h-8 mb-4 object-contain" />
                <p className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>Relatório de Mapeamento de Dados ERP</p>
                <p className="text-xs text-gray-400 mt-2">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
             </div>
