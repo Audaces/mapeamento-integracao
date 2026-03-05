@@ -13,8 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 213 30% 15%;
 
-    /* Azul Audaces #283578 em formato HSL */
-    --primary: 230 50% 31%;
+    --primary: 213 80% 45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 30% 93%;
@@ -31,22 +30,65 @@
 
     --border: 213 20% 88%;
     --input: 213 20% 88%;
-    --ring: 230 50% 31%;
+    --ring: 213 80% 45%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 213 30% 15%;
-    --sidebar-primary: 230 50% 31%;
+    --sidebar-background: 213 30% 15%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 196 70% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 30% 96%;
-    --sidebar-accent-foreground: 230 50% 31%;
-    --sidebar-border: 213 20% 92%;
-    --sidebar-ring: 230 50% 31%;
+    --sidebar-accent: 213 25% 22%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 213 25% 25%;
+    --sidebar-ring: 196 70% 55%;
 
-    --step-active: 230 50% 31%;
+    --step-active: 213 80% 45%;
     --step-complete: 160 60% 45%;
     --step-pending: 213 15% 75%;
+  }
+
+  .dark {
+    --background: 213 30% 10%;
+    --foreground: 210 20% 95%;
+
+    --card: 213 30% 13%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 213 30% 13%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 213 80% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 213 25% 20%;
+    --secondary-foreground: 210 20% 95%;
+
+    --muted: 213 25% 18%;
+    --muted-foreground: 213 15% 60%;
+
+    --accent: 196 70% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 213 25% 22%;
+    --input: 213 25% 22%;
+    --ring: 213 80% 55%;
+
+    --sidebar-background: 213 30% 8%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 196 70% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 213 25% 15%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 213 25% 15%;
+    --sidebar-ring: 196 70% 55%;
+
+    --step-active: 213 80% 55%;
+    --step-complete: 160 60% 50%;
+    --step-pending: 213 15% 40%;
   }
 }
 
@@ -56,8 +98,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 }
 
@@ -68,8 +108,7 @@
     margin: 1.5cm;
   }
 
-  /* 1. ESCONDE O CARD DE SUCESSO E ELEMENTOS DE INTERFACE */
-  /* O !important garante que o navegador não ignore o comando */
+  /* 1. ESCONDE O CARD DE SUCESSO E ELEMENTOS DE TELA */
   .no-print, 
   aside, 
   header, 
@@ -78,13 +117,13 @@
   .lovable-badge, 
   [data-lovable-badge], 
   #lovable-badge,
-  .fixed {
+  .fixed.bottom-4.right-4 {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
   }
 
-  /* 2. FORÇA A QUEBRA DE PÁGINA ENTRE OS STEPS */
+  /* 2. FORÇA A QUEBRA DE PÁGINA EM CADA ETAPA */
   .pdf-page {
     page-break-before: always !important;
     break-before: page !important;
@@ -92,58 +131,48 @@
     width: 100% !important;
     padding-top: 1cm;
     clear: both;
-    position: relative;
   }
 
-  /* Impede que a primeira página saia em branco */
+  /* Impede página em branco antes da primeira etapa */
   .pdf-page:first-child {
     page-break-before: avoid !important;
     break-before: avoid !important;
     padding-top: 0;
   }
 
-  /* 3. CONFIGURAÇÕES GERAIS DO DOCUMENTO PDF */
+  /* 3. RESET DE LAYOUT PARA PDF */
   body, html {
     background-color: white !important;
     height: auto !important;
     overflow: visible !important;
   }
 
-  /* Garante cores e fundos (Ex: Logo e Cards coloridos) */
-  * {
+  body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    color-adjust: exact !important;
   }
 
-  /* Impede que tabelas ou cards fiquem cortados entre duas páginas */
-  table, tr, td, .card, section {
+  /* Impede que tabelas e cards quebrem ao meio entre páginas */
+  table, tr, td, .card {
     page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 }
 
-/* --- AJUSTES VISUAIS PARA A TELA (DESKTOP) --- */
+/* --- AJUSTES VISUAIS DA TELA --- */
 
-/* Escurece o cinza dos passos inativos na barra lateral (#4b5563) */
+/* Escurece o cinza dos passos inativos na barra lateral para melhor leitura */
 .text-gray-600, 
 .text-muted-foreground, 
-.text-gray-400,
 button span:last-child {
   color: #4b5563 !important;
 }
 
-/* Classes para uso rápido do azul Audaces */
+/* Helper para o azul corporativo #283578 */
 .text-corporate-blue {
   color: #283578;
 }
 
 .bg-corporate-blue {
   background-color: #283578;
-}
-
-/* Garante que imagens e logos não distorçam */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
 }
