@@ -41,7 +41,7 @@ export default function MappingLayout() {
     step1: { cliente: "", erp: "", responsavel: "", escopo: "" },
     step2: { benefits: "", rows: [] }, 
     step3: [], 
-    step4: { erpPrints: "", fichaModel: "", checklist: {} }, // Corrigido aqui
+    step4: { erpPrints: "", fichaModel: "", checklist: {} }, 
   });
 
   const updateData = (stepKey: string, data: any) => {
@@ -51,27 +51,45 @@ export default function MappingLayout() {
   const progress = (completedSteps.size / steps.length) * 100;
 
   const validate = () => {
+    // Validação Step 1: Identificação
     if (currentStep === 0) {
       const d = formData.step1;
       return !!(d.cliente && d.erp && d.responsavel && d.escopo);
     }
+    
+    // Validação Step 2: Fluxo da Ficha (Step 4 no arquivo)
     if (currentStep === 1) {
       const d = formData.step2;
       const benefitsOk = d.benefits && d.benefits.trim().length > 0;
-      const rowsOk = d.rows?.filter((r: any) => r.stage && r.stage.trim().length > 0).length >= 3;
+      
+      // Valida se as 3 primeiras linhas têm as 4 colunas obrigatórias preenchidas
+      const rowsOk = d.rows?.filter((r: any, index: number) => {
+        if (index >= 3) return false; // Só validamos as 3 primeiras
+        return (
+          r.stage?.trim().length > 0 && 
+          r.system?.trim().length > 0 && 
+          r.area?.trim().length > 0 && 
+          r.data?.trim().length > 0 // Agora valida "Dados Envolvidos"
+        );
+      }).length >= 3;
+
       return benefitsOk && rowsOk;
     }
+
+    // Validação Step 3: Telas do ERP (Step 5 no arquivo)
     if (currentStep === 2) {
       return formData.step3 && formData.step3.length >= 3;
     }
+    
     return true;
   };
 
   const handleNext = () => {
     if (!validate()) {
       let msg = "Preencha todos os campos obrigatórios (*).";
-      if (currentStep === 1) msg = "Preencha os benefícios e ao menos 3 etapas do fluxo.";
-      if (currentStep === 2) msg = "Adicione pelo menos 3 telas do ERP.";
+      if (currentStep === 1) msg = "Preencha os benefícios e as 4 colunas das 3 primeiras etapas do fluxo.";
+      if (currentStep === 2) msg = "Adicione pelo menos 3 telas do ERP para prosseguir.";
+      
       toast({ title: "Atenção", description: msg, variant: "destructive" });
       return;
     }
@@ -89,13 +107,15 @@ export default function MappingLayout() {
   if (isFinished) {
     return (
       <>
-        {/* TELA DE SUCESSO (Oculta na impressão) */}
+        {/* TELA DE SUCESSO - Oculta na impressão pelo 'no-print' */}
         <div className="no-print flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-in zoom-in duration-300">
           <div className="bg-white p-10 rounded-xl shadow-xl border border-slate-200 text-center max-w-lg w-full">
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileCheck className="w-10 h-10" />
             </div>
+            
             <img src="logo-audaces.png" alt="Audaces" className="h-20 mx-auto mb-4 object-contain" />
+            
             <h1 className="text-2xl font-bold mb-2" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
             <p className="text-gray-600 mb-8">Todos os dados foram coletados com sucesso. Gere agora o seu PDF.</p>
             
@@ -114,7 +134,7 @@ export default function MappingLayout() {
           </div>
         </div>
 
-        {/* ESTRUTURA PARA O PDF (Oculta na tela, visível apenas na impressão) */}
+        {/* ESTRUTURA PARA O PDF - Oculta na tela, visível apenas na impressão */}
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
                <img src="logo-audaces.png" alt="Audaces" className="h-20 mb-4 object-contain" />
