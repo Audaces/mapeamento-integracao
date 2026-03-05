@@ -40,7 +40,7 @@ export default function MappingLayout() {
     step1: { cliente: "", erp: "", responsavel: "", escopo: "" },
     step2: { benefits: "", rows: [] }, 
     step3: [], 
-    step4: { erpPrints: "", fichaModel: "", checklist: {} }
+    step4: { erpPrints: "", fichaModel: "", checklist: {} }, 
   });
 
   const updateData = (stepKey: string, data: any) => {
@@ -74,9 +74,14 @@ export default function MappingLayout() {
       toast({ title: "Atenção", description: msg, variant: "destructive" });
       return;
     }
+
     setCompletedSteps((prev) => new Set([...prev, currentStep]));
-    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
-    else setIsFinished(true);
+    
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      setIsFinished(true);
+    }
   };
 
   if (isFinished) {
@@ -87,9 +92,9 @@ export default function MappingLayout() {
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileCheck className="w-10 h-10" />
             </div>
-            <img src="logo-audaces.png" alt="Audaces" className="h-14 mx-auto mb-4 object-contain" />
+            <img src="logo-audaces.png" alt="Audaces" className="h-12 mx-auto mb-4 object-contain" />
             <h1 className="text-2xl font-bold mb-2" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
-            <p className="text-gray-600 mb-8">Todos os dados foram coletados com sucesso. Gere agora o seu PDF.</p>
+            <p className="text-gray-600 mb-8">Todos os dados foram coletados com sucesso.</p>
             <div className="flex flex-col gap-3">
               <Button className="w-full text-white font-bold h-12 text-lg shadow-lg" style={{ backgroundColor: CORPORATE_BLUE }} onClick={() => window.print()}>
                 <Printer className="w-5 h-5 mr-2" /> Gerar PDF do Relatório
@@ -98,6 +103,7 @@ export default function MappingLayout() {
             </div>
           </div>
         </div>
+
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
                <img src="logo-audaces.png" alt="Audaces" className="h-16 mb-4 object-contain" />
@@ -121,18 +127,23 @@ export default function MappingLayout() {
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: CORPORATE_BLUE }}>Mapeamento de Dados ERP</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          {steps.map((step, i) => (
-            <button key={step.id} onClick={() => (completedSteps.has(i) || i < currentStep) && setCurrentStep(i)}
-              className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-left",
-                i === currentStep ? "bg-slate-100 font-bold" : "")}>
-              <span className={cn("flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0",
-                  completedSteps.has(i) ? "bg-green-600 text-white" : i === currentStep ? "text-white" : "bg-gray-200 text-gray-500")}
-                style={i === currentStep && !completedSteps.has(i) ? { backgroundColor: CORPORATE_BLUE } : {}}>
-                {completedSteps.has(i) ? <CheckCircle2 className="w-4 h-4" /> : step.id}
-              </span>
-              <span style={{ color: i === currentStep ? CORPORATE_BLUE : INACTIVE_TEXT }}>{step.title}</span>
-            </button>
-          ))}
+          {steps.map((step, i) => {
+            const isActive = i === currentStep;
+            const isComplete = completedSteps.has(i);
+            return (
+              <button key={step.id} 
+                onClick={() => (isComplete || i < currentStep) && setCurrentStep(i)}
+                className={cn("w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors text-left",
+                  isActive ? "bg-slate-100 font-bold shadow-sm" : "hover:bg-slate-50")}>
+                <span className={cn("flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold shrink-0",
+                    isComplete ? "bg-green-600 text-white" : isActive ? "text-white" : "bg-gray-200 text-gray-500")}
+                  style={isActive && !isComplete ? { backgroundColor: CORPORATE_BLUE } : {}}>
+                  {isComplete ? <CheckCircle2 className="w-4 h-4" /> : step.id}
+                </span>
+                <span style={{ color: isActive ? CORPORATE_BLUE : INACTIVE_TEXT }}>{step.title}</span>
+              </button>
+            );
+          })}
         </nav>
         <div className="p-4 border-t space-y-3 bg-slate-50">
           <div className="space-y-1">
@@ -145,16 +156,18 @@ export default function MappingLayout() {
           <p className="text-[10px] text-center text-gray-400 font-medium italic">Mapeamento Audaces ERP</p>
         </div>
       </aside>
+
       <main className="flex-1 flex flex-col min-w-0 bg-slate-50/30">
-        <header className="no-print border-b px-6 py-2 flex items-center justify-between bg-white shadow-sm">
-          <span className="text-[10px] font-bold text-gray-400 uppercase">Etapa {currentStep + 1} de 4</span>
+        <header className="no-print border-b px-6 py-2 flex items-center justify-between bg-white shadow-sm z-10">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Etapa {currentStep + 1} de 4</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>Anterior</Button>
-            <Button size="sm" onClick={handleNext} style={{ backgroundColor: CORPORATE_BLUE }} className="text-white px-6 font-bold">
+            <Button size="sm" onClick={handleNext} style={{ backgroundColor: CORPORATE_BLUE }} className="text-white px-6 font-bold shadow-md hover:opacity-90">
               {currentStep === 3 ? "Finalizar Mapeamento" : "Próximo"}
             </Button>
           </div>
         </header>
+
         <div className="flex-1 overflow-auto p-8 print:hidden">
           {currentStep === 0 && <Step1Identification data={formData.step1} update={(d: any) => updateData('step1', d)} />}
           {currentStep === 1 && <Step4Workflow data={formData.step2} update={(d: any) => updateData('step2', d)} />}
