@@ -36,12 +36,11 @@ export default function MappingLayout() {
   const [isFinished, setIsFinished] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
-  // ESTADO GLOBAL: Centraliza os dados para validação e PDF
   const [formData, setFormData] = useState({
     step1: { cliente: "", erp: "", responsavel: "", escopo: "" },
     step2: { benefits: "", rows: [] }, 
     step3: [], 
-    step4: { erpPrints: "", fichaModel: "", checklist: {} }, // Corrigido aqui
+    step4: { erpPrints: "", fichaModel: "", checklist: {} }, 
   });
 
   const updateData = (stepKey: string, data: any) => {
@@ -85,43 +84,35 @@ export default function MappingLayout() {
     }
   };
 
-  // --- VISUALIZAÇÃO FINAL (TELA DE SUCESSO + PDF) ---
   if (isFinished) {
     return (
       <>
-        {/* TELA DE SUCESSO (Oculta na impressão) */}
         <div className="no-print flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-in zoom-in duration-300">
           <div className="bg-white p-10 rounded-xl shadow-xl border border-slate-200 text-center max-w-lg w-full">
             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileCheck className="w-10 h-10" />
             </div>
-            <img src="logo-audaces.png" alt="Audaces" className="h-20 mx-auto mb-4 object-contain" />
+            
+            <img src="logo-audaces.png" alt="Audaces" className="h-12 mx-auto mb-4 object-contain" />
+            
             <h1 className="text-2xl font-bold mb-2" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
-            <p className="text-gray-600 mb-8">Todos os dados foram coletados com sucesso. Gere agora o seu PDF.</p>
+            <p className="text-gray-600 mb-8">Dados coletados com sucesso. Gere o seu PDF.</p>
             
             <div className="flex flex-col gap-3">
-              <Button 
-                className="w-full text-white font-bold h-12 text-lg shadow-lg" 
-                style={{ backgroundColor: CORPORATE_BLUE }} 
-                onClick={() => window.print()}
-              >
+              <Button className="w-full text-white font-bold h-12 text-lg shadow-lg" style={{ backgroundColor: CORPORATE_BLUE }} onClick={() => window.print()}>
                 <Printer className="w-5 h-5 mr-2" /> Gerar PDF do Relatório
               </Button>
-              <Button variant="ghost" className="text-gray-500" onClick={() => setIsFinished(false)}>
-                Revisar Dados
-              </Button>
+              <Button variant="ghost" className="text-gray-500" onClick={() => setIsFinished(false)}>Revisar Dados</Button>
             </div>
           </div>
         </div>
 
-        {/* ESTRUTURA PARA O PDF (Oculta na tela, visível apenas na impressão) */}
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
-               <img src="logo-audaces.png" alt="Audaces" className="h-20 mb-4 object-contain" />
+               <img src="logo-audaces.png" alt="Audaces" className="h-16 mb-4 object-contain" />
                <p className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>Relatório de Mapeamento de Dados ERP</p>
                <p className="text-xs text-gray-400 mt-2">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
             </div>
-
             <section className="pdf-page px-12"><Step1Identification data={formData.step1} isPrint /></section>
             <section className="pdf-page px-12"><Step4Workflow data={formData.step2} isPrint /></section>
             <section className="pdf-page px-12"><Step5ErpScreens data={formData.step3} isPrint /></section>
@@ -131,13 +122,16 @@ export default function MappingLayout() {
     );
   }
 
-  // --- VISUALIZACAO DO FORMULÁRIO (NAVEGAÇÃO) ---
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="no-print w-64 shrink-0 bg-white flex flex-col border-r shadow-sm">
-        <div className="pt-4 pb-3 px-4 border-b">
-          <img src="logo-audaces.png" alt="Audaces" className="h-30 w-auto mb-2 object-contain" />
-          <p className="text-[14px] font-bold" style={{ color: CORPORATE_BLUE }}>Mapeamento de Dados ERP</p>
+        <div className="pt-5 pb-3 px-4 border-b">
+          {/* AUMENTEI A LOGO AQUI (h-12) */}
+          <img src="logo-audaces.png" alt="Audaces" className="h-12 w-auto mb-2 object-contain" />
+          {/* AUMENTEI O TEXTO AQUI (text-xs) */}
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: CORPORATE_BLUE }}>
+            Mapeamento de Dados ERP
+          </p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {steps.map((step, i) => {
@@ -166,15 +160,13 @@ export default function MappingLayout() {
             </div>
             <Progress value={progress} className="h-1.5" />
           </div>
-          <p className="text-[10px] text-center text-gray-400 font-medium italic">
-            Mapeamento Audaces ERP
-          </p>
+          <p className="text-[10px] text-center text-gray-400 font-medium italic">Mapeamento Audaces ERP</p>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 bg-slate-50/30">
         <header className="no-print border-b px-6 py-2 flex items-center justify-between bg-white shadow-sm z-10">
-          <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase">Etapa {currentStep + 1} de 4</span>
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Etapa {currentStep + 1} de 4</span>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
               Anterior
