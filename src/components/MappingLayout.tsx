@@ -30,10 +30,11 @@ export default function MappingLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
+  // ESTADO GLOBAL: Centraliza os dados para validação e PDF
   const [formData, setFormData] = useState({
     step1: { cliente: "", erp: "", responsavel: "", escopo: "" },
     step2: { benefits: "", rows: [] }, 
-    step3: [], 
+    step3: { rows: [], skipped: {} }, // Ajustado para objeto com rows e skipped
     step4: { erpPrints: "", fichaModel: "", checklist: {} }, 
   });
 
@@ -44,10 +45,13 @@ export default function MappingLayout() {
   const progress = (completedSteps.size / steps.length) * 100;
 
   const validate = () => {
+    // Validação Etapa 1
     if (currentStep === 0) {
       const d = formData.step1;
       return !!(d.cliente && d.erp && d.responsavel && d.escopo);
     }
+    
+    // Validação Etapa 2
     if (currentStep === 1) {
       const d = formData.step2;
       const benefitsOk = d.benefits && d.benefits.trim().length > 0;
@@ -57,7 +61,35 @@ export default function MappingLayout() {
       }).length >= 3;
       return benefitsOk && rowsOk;
     }
-    if (currentStep === 2) return formData.step3 && formData.step3.length >= 3;
+
+    // Validação Etapa 3 (Telas ERP - com lógica de Skip)
+    if (currentStep === 2) {
+      const d = formData.step3;
+      const rows = d.rows || [];
+      const skipped = d.skipped || {};
+
+      // Categorias que existem no Step 5
+      const cats = ["produto", "materiais", "operacoes", "outros"];
+
+      // Valida cada categoria individualmente
+      const allCatsValid = cats.every(catKey => {
+        if (skipped[catKey]) return true; // Válido se estiver marcado como "não terá"
+        
+        // Conta quantas linhas completas existem para esta categoria
+        const count = rows.filter((r: any) => 
+          r.category === catKey && 
+          r.tela?.trim().length > 0 && 
+          r.campo?.trim().length > 0 && 
+          r.tipo?.trim().length > 0 && 
+          r.obrigatorio?.trim().length > 0
+        ).length;
+        
+        return count >= 3;
+      });
+
+      return allCatsValid;
+    }
+
     return true;
   };
 
@@ -65,13 +97,19 @@ export default function MappingLayout() {
     if (!validate()) {
       let msg = "Preencha todos os campos obrigatórios (*).";
       if (currentStep === 1) msg = "Preencha os benefícios e as 4 colunas das 3 primeiras etapas do fluxo.";
-      if (currentStep === 2) msg = "Adicione pelo menos 3 telas do ERP.";
+      if (currentStep === 2) msg = "As categorias ativas devem ter ao menos 3 campos mapeados.";
+      
       toast({ title: "Atenção", description: msg, variant: "destructive" });
       return;
     }
+
     setCompletedSteps((prev) => new Set([...prev, currentStep]));
-    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
-    else setIsFinished(true);
+    
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      setIsFinished(true);
+    }
     setIsMobileMenuOpen(false);
   };
 
@@ -85,12 +123,19 @@ export default function MappingLayout() {
             </div>
             <img src="logo-audaces.png" alt="Audaces" className="h-10 md:h-12 mx-auto mb-4 object-contain" />
             <h1 className="text-xl md:text-2xl font-bold mb-2" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
-            <p className="text-sm md:text-base text-gray-600 mb-8">Todos os dados foram coletados com sucesso.</p>
+            <p className="text-sm md:text-base text-gray-600 mb-8">Todos os dados foram coletados com sucesso. Gere agora o seu PDF.</p>
+            
             <div className="flex flex-col gap-3">
-              <Button className="w-full text-white font-bold h-12 shadow-lg" style={{ backgroundColor: CORPORATE_BLUE }} onClick={() => window.print()}>
+              <Button 
+                className="w-full text-white font-bold h-12 shadow-lg hover:opacity-90" 
+                style={{ backgroundColor: CORPORATE_BLUE }} 
+                onClick={() => window.print()}
+              >
                 <Printer className="w-5 h-5 mr-2" /> Gerar PDF do Relatório
               </Button>
-              <Button variant="ghost" onClick={() => setIsFinished(false)}>Revisar Dados</Button>
+              <Button variant="ghost" className="text-gray-500" onClick={() => setIsFinished(false)}>
+                Revisar Dados
+              </Button>
             </div>
           </div>
         </div>
@@ -112,7 +157,7 @@ export default function MappingLayout() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-background">
-      {/* Botão de Menu Mobile */}
+      {/* Header Mobile */}
       <div className="md:hidden no-print flex items-center justify-between p-4 bg-white border-b sticky top-0 z-50">
         <img src="logo-audaces.png" alt="Audaces" className="h-8 object-contain" />
         <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -120,7 +165,7 @@ export default function MappingLayout() {
         </Button>
       </div>
 
-      {/* Sidebar - Responsiva */}
+      {/* Sidebar Responsiva */}
       <aside className={cn(
         "no-print w-full md:w-64 shrink-0 bg-white flex flex-col border-r shadow-sm transition-all duration-300",
         "fixed md:relative inset-y-0 left-0 z-40 transform md:transform-none",
@@ -132,24 +177,28 @@ export default function MappingLayout() {
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {steps.map((step, i) => (
-            <button key={step.id} 
-              onClick={() => {
-                if (completedSteps.has(i) || i < currentStep) {
-                  setCurrentStep(i);
-                  setIsMobileMenuOpen(false);
-                }
-              }}
-              className={cn("w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors text-left",
-                i === currentStep ? "bg-slate-100 font-bold shadow-sm" : "hover:bg-slate-50")}>
-              <span className={cn("flex items-center justify-center w-8 h-8 md:w-6 md:h-6 rounded-full text-xs font-bold shrink-0",
-                  completedSteps.has(i) ? "bg-green-600 text-white" : i === currentStep ? "text-white" : "bg-gray-200 text-gray-500")}
-                style={i === currentStep && !completedSteps.has(i) ? { backgroundColor: CORPORATE_BLUE } : {}}>
-                {completedSteps.has(i) ? <CheckCircle2 className="w-4 h-4" /> : step.id}
-              </span>
-              <span style={{ color: i === currentStep ? CORPORATE_BLUE : INACTIVE_TEXT }}>{step.title}</span>
-            </button>
-          ))}
+          {steps.map((step, i) => {
+            const isActive = i === currentStep;
+            const isComplete = completedSteps.has(i);
+            return (
+              <button key={step.id} 
+                onClick={() => {
+                  if (isComplete || i < currentStep) {
+                    setCurrentStep(i);
+                    setIsMobileMenuOpen(false);
+                  }
+                }}
+                className={cn("w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors text-left",
+                  isActive ? "bg-slate-100 font-bold shadow-sm" : "hover:bg-slate-50")}>
+                <span className={cn("flex items-center justify-center w-8 h-8 md:w-6 md:h-6 rounded-full text-xs font-bold shrink-0",
+                    isComplete ? "bg-green-600 text-white" : isActive ? "text-white" : "bg-gray-200 text-gray-500")}
+                  style={isActive && !isComplete ? { backgroundColor: CORPORATE_BLUE } : {}}>
+                  {isComplete ? <CheckCircle2 className="w-4 h-4" /> : step.id}
+                </span>
+                <span style={{ color: isActive ? CORPORATE_BLUE : INACTIVE_TEXT }}>{step.title}</span>
+              </button>
+            );
+          })}
         </nav>
         
         <div className="p-4 border-t space-y-3 bg-slate-50">
@@ -158,7 +207,7 @@ export default function MappingLayout() {
         </div>
       </aside>
 
-      {/* Backdrop para fechar o menu mobile ao clicar fora */}
+      {/* Backdrop Mobile */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-black/20 z-30 md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
       )}
@@ -168,8 +217,8 @@ export default function MappingLayout() {
         <header className="no-print border-b px-4 md:px-6 py-3 flex items-center justify-between bg-white shadow-sm z-10">
           <span className="hidden md:inline text-[10px] font-bold text-gray-400 uppercase tracking-widest">Etapa {currentStep + 1} de 4</span>
           <h2 className="md:hidden text-sm font-bold" style={{ color: CORPORATE_BLUE }}>{steps[currentStep].title}</h2>
-          <div className="flex gap-2 w-full md:w-auto justify-end">
-            <Button variant="outline" size="sm" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0} className="text-xs px-2 h-8">
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0} className="text-xs h-8">
               <ChevronLeft className="w-4 h-4 md:mr-1" /> <span className="hidden md:inline">Anterior</span>
             </Button>
             <Button size="sm" onClick={handleNext} style={{ backgroundColor: CORPORATE_BLUE }} className="text-white px-4 md:px-6 font-bold shadow-md text-xs h-8">
