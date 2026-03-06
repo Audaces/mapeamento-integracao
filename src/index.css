@@ -176,3 +176,33 @@ button span:last-child {
 .bg-corporate-blue {
   background-color: #283578;
 }
+
+/* --- AJUSTE DAS MENSAGENS DE ALERTA (TOAST) --- */
+
+/* Alvos: a caixa da mensagem de erro/atenção */
+.bg-destructive {
+  /* 1. Vermelho mais suave (estilo coral/pastel) */
+  background-color: #ef4444 !important; /* Um vermelho menos "neon" */
+  opacity: 0.95;
+  
+  /* 2. Deixar a caixinha bem mais redonda */
+  border-radius: 1.25rem !important; /* Equivalente ao rounded-2xl do Tailwind */
+  
+  /* 3. Ajuste de sombra para ficar mais elegante */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  
+  /* 4. Margem para não colar na borda da tela */
+  margin-bottom: 1rem !important;
+  border: none !important;
+}
+
+/* Ajuste do texto dentro da caixa */
+.bg-destructive [data-title] {
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+}
+
+.bg-destructive [data-description] {
+  font-size: 0.85rem !important;
+  opacity: 0.9;
+}
