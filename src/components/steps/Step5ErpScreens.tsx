@@ -135,7 +135,7 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
             <Monitor className="w-4 h-4 md:w-5 md:h-5" /> Instruções
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">
-            Navegue pelas abas e mapeie os campos do ERP. Se não houver integração para um item, use o check de exclusão.
+            Navegue pelas abas e realize o mapeamento dos campos do ERP. Caso algum item não faça parte da integração, utilize a opção de exclusão. Para ERPs já integrados, o mapeamento deve seguir o escopo já estabelecido na documentação, não sendo permitido alterar ou expandir a integração. Caso haja necessidade de ampliação do escopo, o cliente deve alinhar previamente com o fornecedor do ERP a viabilidade de implementação.
           </CardDescription>
         </CardHeader>
       </Card>
