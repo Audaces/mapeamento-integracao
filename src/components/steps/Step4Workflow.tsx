@@ -87,11 +87,9 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
       <Card>
         <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>
-            Benefícios Esperados <span className="text-red-500">*</span>
+            Expectativa do cliente <span className="text-red-500">*</span>
+            <FieldHelp text="Descreva qual problema a integração deve resolver e quais resultados o cliente espera obter no processo" />
           </CardTitle>
-          <CardDescription className="text-xs md:text-sm">
-            Descreva os principais benefícios e dores que o cliente espera resolver com a integração
-          </CardDescription>
         </CardHeader>
         <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
           <Textarea
@@ -145,6 +143,7 @@ export default function Step4Workflow({ data = { benefits: "", rows: [] }, updat
         <CardHeader className="p-4 md:p-6">
           <CardTitle className="text-base md:text-lg" style={{ color: CORPORATE_BLUE }}>
             Fluxo do Cliente <span className="text-red-500">*</span>
+            <FieldHelp text="Informe na tabela o fluxo do processo no cliente, detalhando sistema de origem, sistema de destino e dados integrados em cada etapa." />
           </CardTitle>
           <CardDescription className="text-xs">As 4 primeiras colunas das 3 primeiras linhas são obrigatórias</CardDescription>
         </CardHeader>
