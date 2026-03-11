@@ -95,7 +95,7 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {}, produc
         {/* Info de Código e Regras no PDF */}
         <div className="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border">
             <div>
-                <p className="text-[10px] uppercase font-bold text-slate-500">Logística de Código (Retorno):</p>
+                <p className="text-[10px] uppercase font-bold text-slate-500">Geração de código da referência (Retorno):</p>
                 <p className="text-sm font-medium">{data.productCodeType || "Não informado"}</p>
             </div>
             <div>
@@ -152,7 +152,7 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {}, produc
             <Monitor className="w-4 h-4 md:w-5 md:h-5" /> Instruções
           </CardTitle>
           <CardDescription className="text-xs md:text-sm leading-relaxed text-slate-600">
-            Navegue pelas abas e mapeie os campos do ERP. Defina as regras de negócio e como o ERP lidará com os códigos gerados no retorno da integração.
+            Navegue pelas abas e mapeie os campos do ERP. Defina as regras de negócio e como o ERP lidará com os códigos de produto gerados no retorno da integração.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -162,8 +162,8 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {}, produc
         <Card className="border-blue-100 shadow-sm">
           <CardHeader className="p-4">
             <CardTitle className="text-sm flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
-              <Settings2 className="w-4 h-4" /> Logística de Código (Retorno) <span className="text-red-500">*</span>
-              <FieldHelp text="Como o ERP se comporta ao receber um novo produto: Dinâmico (Audaces sugere), Sequencial (ERP ignora sugestão e gera o próximo) ou Manual (Usuário digita)." />
+              <Settings2 className="w-4 h-4" /> Geração de código da referência (Retorno) <span className="text-red-500">*</span>
+              <FieldHelp text="Como o ERP se comporta ao receber um novo produto: Dinâmico (Definido pelo ERP com alguma regra), Sequencial (ERP gera automaticamente sequencial) ou Manual (Usuário digita)." />
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
@@ -177,7 +177,7 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {}, produc
               <SelectContent>
                 <SelectItem value="Dinâmico">Dinâmico (Audaces envia o código)</SelectItem>
                 <SelectItem value="Sequencial">Sequencial (ERP gera o próximo disponível)</SelectItem>
-                <SelectItem value="Manual">Manual (ERP exige digitação no ato)</SelectItem>
+                <SelectItem value="Manual">Manual (Usuário digita a informação e o erp assume aquele código)</SelectItem>
               </SelectContent>
             </Select>
           </CardContent>
@@ -187,12 +187,12 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {}, produc
           <CardHeader className="p-4">
             <CardTitle className="text-sm flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
               <FileText className="w-4 h-4" /> Regras de Negócio <span className="text-red-500">*</span>
-              <FieldHelp text="Descreva regras específicas, como: campos que precisam de transformação, validações extras ou condições de salvamento." />
+              <FieldHelp text="Descreva regras específicas, como: validações extras ou condições de salvamento." />
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
             <Textarea 
-              placeholder="Ex: Materiais só integram se tiverem NCM preenchido..."
+              placeholder="Ex: o Código do modelo precisa seguir a regra de preenchimento de começar com PRD..."
               className="text-xs min-h-[40px] border-blue-200"
               value={data.businessRules || ""}
               onChange={(e) => handleGlobalFieldChange("businessRules", e.target.value)}
