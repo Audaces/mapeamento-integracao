@@ -8,7 +8,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Monitor, Plus, Ban, HelpCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Monitor, Plus, Ban, HelpCircle, Settings2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const CORPORATE_BLUE = "#283578";
@@ -38,7 +39,7 @@ const categories = [
 
 const dataTypes = ["Texto", "Número", "Data", "Lista/Enum", "Booleano", "Código"];
 
-export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, update, isPrint }: any) {
+export default function Step5ErpScreens({ data = { rows: [], skipped: {}, productCodeType: "", businessRules: "" }, update, isPrint }: any) {
   const [localRows, setLocalRows] = useState<any[]>(data.rows || []);
   const [skipped, setSkipped] = useState<Record<string, boolean>>(data.skipped || {});
 
@@ -55,7 +56,7 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
         }))
       );
       setLocalRows(initial);
-      update({ rows: initial, skipped: {} });
+      update({ ...data, rows: initial });
     }
   }, []);
 
@@ -64,20 +65,24 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
     if (!updated[index]) return;
     updated[index][field] = value;
     setLocalRows(updated);
-    update({ rows: updated, skipped });
+    update({ ...data, rows: updated });
   };
 
   const handleSkipToggle = (categoryKey: string) => {
     const newSkipped = { ...skipped, [categoryKey]: !skipped[categoryKey] };
     setSkipped(newSkipped);
-    update({ rows: localRows, skipped: newSkipped });
+    update({ ...data, skipped: newSkipped });
+  };
+
+  const handleGlobalFieldChange = (field: string, value: string) => {
+    update({ ...data, [field]: value });
   };
 
   const addRow = (categoryKey: string, categoryLabel: string) => {
     const newRow = { category: categoryKey, categoryLabel, tela: "", campo: "", tipo: "", obrigatorio: "" };
     const updated = [...localRows, newRow];
     setLocalRows(updated);
-    update({ rows: updated, skipped });
+    update({ ...data, rows: updated });
   };
 
   if (isPrint) {
@@ -85,6 +90,18 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
       <div className="space-y-8">
         <div className="border-b-2 pb-2" style={{ borderColor: CORPORATE_BLUE }}>
           <h2 className="text-xl font-bold" style={{ color: CORPORATE_BLUE }}>3. Telas e Campos do ERP</h2>
+        </div>
+
+        {/* Info de Código e Regras no PDF */}
+        <div className="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border">
+            <div>
+                <p className="text-[10px] uppercase font-bold text-slate-500">Logística de Código (Retorno):</p>
+                <p className="text-sm font-medium">{data.productCodeType || "Não informado"}</p>
+            </div>
+            <div>
+                <p className="text-[10px] uppercase font-bold text-slate-500">Regras de Negócio:</p>
+                <p className="text-sm italic">{data.businessRules || "Nenhuma regra adicional informada."}</p>
+            </div>
         </div>
 
         {categories.map((cat) => {
@@ -128,21 +145,65 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-4 md:space-y-6 px-1 md:px-0">
+    <div className="max-w-5xl mx-auto space-y-4 md:space-y-6 px-1 md:px-0 pb-10">
       <Card className="border-primary/20 bg-primary/5 no-print text-sm">
         <CardHeader className="p-4 md:pb-3">
           <CardTitle className="text-sm md:text-base flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
             <Monitor className="w-4 h-4 md:w-5 md:h-5" /> Instruções
           </CardTitle>
-          <CardDescription className="text-xs md:text-sm">
-            Navegue pelas abas e realize o mapeamento dos campos do ERP. Caso algum item não faça parte da integração, utilize a opção de exclusão. Para ERPs já integrados, o mapeamento deve seguir o escopo já estabelecido na documentação, não sendo permitido alterar ou expandir a integração. Caso haja necessidade de ampliação do escopo, o cliente deve alinhar previamente com o fornecedor do ERP a viabilidade de implementação.
+          <CardDescription className="text-xs md:text-sm leading-relaxed text-slate-600">
+            Navegue pelas abas e mapeie os campos do ERP. Defina as regras de negócio e como o ERP lidará com os códigos gerados no retorno da integração.
           </CardDescription>
         </CardHeader>
       </Card>
 
+      {/* --- NOVA SEÇÃO: LOGÍSTICA DE CÓDIGO E REGRAS --- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-blue-100 shadow-sm">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+              <Settings2 className="w-4 h-4" /> Logística de Código (Retorno) <span className="text-red-500">*</span>
+              <FieldHelp text="Como o ERP se comporta ao receber um novo produto: Dinâmico (Audaces sugere), Sequencial (ERP ignora sugestão e gera o próximo) ou Manual (Usuário digita)." />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <Select 
+              value={data.productCodeType || ""} 
+              onValueChange={(v) => handleGlobalFieldChange("productCodeType", v)}
+            >
+              <SelectTrigger className="w-full border-blue-200">
+                <SelectValue placeholder="Selecione o tipo de geração" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Dinâmico">Dinâmico (Audaces envia o código)</SelectItem>
+                <SelectItem value="Sequencial">Sequencial (ERP gera o próximo disponível)</SelectItem>
+                <SelectItem value="Manual">Manual (ERP exige digitação no ato)</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-100 shadow-sm">
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm flex items-center gap-2" style={{ color: CORPORATE_BLUE }}>
+              <FileText className="w-4 h-4" /> Regras de Negócio <span className="text-red-500">*</span>
+              <FieldHelp text="Descreva regras específicas, como: campos que precisam de transformação, validações extras ou condições de salvamento." />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-0">
+            <Textarea 
+              placeholder="Ex: Materiais só integram se tiverem NCM preenchido..."
+              className="text-xs min-h-[40px] border-blue-200"
+              value={data.businessRules || ""}
+              onChange={(e) => handleGlobalFieldChange("businessRules", e.target.value)}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
       <Card className="mx-1 md:mx-0 shadow-sm">
         <CardHeader className="p-4 md:p-6 pb-0 md:pb-2">
-          <CardTitle className="text-base md:text-xl" style={{ color: CORPORATE_BLUE }}>Telas e Campos do ERP</CardTitle>
+          <CardTitle className="text-base md:text-xl font-bold text-slate-800">Mapeamento por Categoria</CardTitle>
         </CardHeader>
         <CardContent className="p-2 md:p-6">
           <Tabs defaultValue="produto">
@@ -169,33 +230,36 @@ export default function Step5ErpScreens({ data = { rows: [], skipped: {} }, upda
                   </div>
 
                   <div className={cn("transition-opacity duration-300", isCatSkipped ? "opacity-30 pointer-events-none" : "opacity-100")}>
+                    <div className="mb-4 p-3 bg-slate-50 border rounded-md">
+                      <p className="text-[10px] md:text-xs text-slate-600 italic">
+                        Dicas {cat.label}: {cat.fields.join(", ")}
+                      </p>
+                    </div>
+                    
                     <div className="overflow-x-auto border rounded-md">
                       <Table className="min-w-[700px]">
                         <TableHeader className="bg-slate-50">
                           <TableRow>
-                            {/* CABEÇALHOS COM TOOLTIP */}
-                            <TableHead className="text-slate-900 text-xs">
+                            <TableHead className="text-slate-900 text-xs py-2">
                               <div className="flex items-center">
                                 Módulo / Tela <span className="text-red-500 ml-0.5">*</span>
-                                <FieldHelp text="Nome do menu ou tela dentro do ERP parceiro." />
+                                <FieldHelp text="Onde este dado é cadastrado no ERP." />
                               </div>
                             </TableHead>
-                            <TableHead className="text-slate-900 text-xs">
+                            <TableHead className="text-slate-900 text-xs py-2">
                               <div className="flex items-center">
                                 Campo no ERP <span className="text-red-500 ml-0.5">*</span>
-                                <FieldHelp text="Nome técnico ou da etiqueta do campo no sistema parceiro." />
+                                <FieldHelp text="Nome do campo exato no banco/tela do ERP." />
                               </div>
                             </TableHead>
-                            <TableHead className="text-slate-900 text-xs">
+                            <TableHead className="text-slate-900 text-xs py-2">
                               <div className="flex items-center">
                                 Tipo de Dado <span className="text-red-500 ml-0.5">*</span>
-                                <FieldHelp text="Natureza da informação (Texto, Número, Data, etc)." />
                               </div>
                             </TableHead>
-                            <TableHead className="w-24 text-slate-900 text-xs">
+                            <TableHead className="w-24 text-slate-900 text-xs py-2 text-center">
                               <div className="flex items-center justify-center">
                                 Obrig. <span className="text-red-500 ml-0.5">*</span>
-                                <FieldHelp text="Indique se o campo é obrigatório para salvar o registro no ERP." />
                               </div>
                             </TableHead>
                           </TableRow>
