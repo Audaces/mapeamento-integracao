@@ -181,7 +181,7 @@ export default function MappingLayout() {
     <div className="flex min-h-screen bg-background">
       <aside className="no-print w-64 shrink-0 bg-white flex flex-col border-r shadow-sm hidden md:flex">
         <div className="pt-6 pb-4 px-4 border-b">
-          <img src="logo-audaces.png" alt="Audaces" className="h-10 w-auto mb-2 object-contain" />
+          <img src="logo-audaces.png" alt="Audaces" className="h-8 w-auto mb-2 object-contain" />
           <p className="text-xs font-bold tracking-tight" style={{ color: CORPORATE_BLUE }}>Mapeamento de Dados ERP</p>
         </div>
         <nav className="flex-1 p-4 space-y-1">
