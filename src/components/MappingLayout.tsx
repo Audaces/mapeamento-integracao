@@ -41,11 +41,10 @@ export default function MappingLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
-  // ESTADO GLOBAL: Centraliza os dados para validação e PDF
   const [formData, setFormData] = useState({
     step1: { cliente: "", erp: "", responsavel: "", escopo: "" },
     step2: { benefits: "", rows: [] }, 
-    step3: { rows: [], skipped: {}, productCodeType: "", businessRules: "" }, // Ajustado para novos campos
+    step3: { rows: [], skipped: {}, productCodeType: "", businessRules: "" },
     step4: { erpPrints: "", fichaModel: "", checklist: {} }, 
   });
 
@@ -56,13 +55,11 @@ export default function MappingLayout() {
   const progress = (completedSteps.size / steps.length) * 100;
 
   const validate = () => {
-    // Validação Passo 1
     if (currentStep === 0) {
       const d = formData.step1;
       return !!(d.cliente && d.erp && d.responsavel && d.escopo);
     }
     
-    // Validação Passo 2 (Fluxo)
     if (currentStep === 1) {
       const d = formData.step2;
       const benefitsOk = d.benefits && d.benefits.trim().length > 0;
@@ -73,14 +70,9 @@ export default function MappingLayout() {
       return benefitsOk && rowsOk;
     }
 
-    // Validação Passo 3 (Telas ERP + Regras + Logística)
     if (currentStep === 2) {
       const d = formData.step3;
-      
-      // 1. Valida campos de Regras e Logística
       const rulesOk = d.productCodeType && d.businessRules && d.businessRules.trim().length > 3;
-      
-      // 2. Valida se categorias ativas têm ao menos 3 campos
       const cats = ["produto", "materiais", "operacoes", "outros"];
       const allCatsValid = cats.every(catKey => {
         if (d.skipped?.[catKey]) return true;
@@ -89,7 +81,6 @@ export default function MappingLayout() {
         ).length;
         return count >= 3;
       });
-
       return rulesOk && allCatsValid;
     }
 
@@ -116,7 +107,6 @@ export default function MappingLayout() {
     setIsMobileMenuOpen(false);
   };
 
-  // --- VISUALIZACAO FINAL (APÓS CONCLUIR) ---
   if (isFinished) {
     return (
       <>
@@ -130,7 +120,6 @@ export default function MappingLayout() {
             <h1 className="text-2xl font-bold mb-6" style={{ color: CORPORATE_BLUE }}>Mapeamento Finalizado!</h1>
             
             <div className="space-y-6 text-left mb-8">
-              {/* PASSO 1 */}
               <div className="p-4 rounded-lg border border-slate-100 bg-slate-50/50">
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -148,7 +137,6 @@ export default function MappingLayout() {
                 </div>
               </div>
 
-              {/* PASSO 2 (Lembrete) */}
               <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-100">
                 <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                 <div>
@@ -159,7 +147,6 @@ export default function MappingLayout() {
                 </div>
               </div>
 
-              {/* PASSO 3 */}
               <div className="p-4 rounded-lg border border-slate-100 bg-slate-50/50">
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -184,7 +171,6 @@ export default function MappingLayout() {
           </div>
         </div>
 
-        {/* ESTRUTURA PARA O PDF */}
         <div className="hidden print:block bg-white w-full">
             <div className="p-12 border-b-4 mb-8" style={{ borderColor: CORPORATE_BLUE }}>
                <img src="logo-audaces.png" alt="Audaces" className="h-14 mb-4 object-contain" />
@@ -267,11 +253,24 @@ export default function MappingLayout() {
           </div>
         </header>
 
+        {/*
+          FIX: Todos os steps são renderizados de uma vez e ocultados via CSS.
+          Isso evita que os componentes desmontem/remontem ao trocar de step,
+          o que causava o reset dos dados preenchidos (especialmente no Step5).
+        */}
         <div className="flex-1 overflow-auto p-4 md:p-8 print:hidden">
-          {currentStep === 0 && <Step1Identification data={formData.step1} update={(d: any) => updateData('step1', d)} />}
-          {currentStep === 1 && <Step4Workflow data={formData.step2} update={(d: any) => updateData('step2', d)} />}
-          {currentStep === 2 && <Step5ErpScreens data={formData.step3} update={(d: any) => updateData('step3', d)} />}
-          {currentStep === 3 && <Step6Rules data={formData.step4} update={(d: any) => updateData('step4', d)} />}
+          <div className={currentStep === 0 ? "block" : "hidden"}>
+            <Step1Identification data={formData.step1} update={(d: any) => updateData('step1', d)} />
+          </div>
+          <div className={currentStep === 1 ? "block" : "hidden"}>
+            <Step4Workflow data={formData.step2} update={(d: any) => updateData('step2', d)} />
+          </div>
+          <div className={currentStep === 2 ? "block" : "hidden"}>
+            <Step5ErpScreens data={formData.step3} update={(d: any) => updateData('step3', d)} />
+          </div>
+          <div className={currentStep === 3 ? "block" : "hidden"}>
+            <Step6Rules data={formData.step4} update={(d: any) => updateData('step4', d)} />
+          </div>
         </div>
       </main>
     </div>
